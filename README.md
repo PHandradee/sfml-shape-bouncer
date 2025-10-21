@@ -88,4 +88,4 @@ Assignment: 1
 
 ## 📚 Learning Resources
 This assignment builds upon concepts taught in the official course lecture series:  
-[Game Programming – Memorial University (YouTube Playlist)](https://www.youtube.com/watch?v=N4uMNj_hxvU&list=PL_xRyXins84_Sq7yZkxGP_MgYAH-Zo8Uu&index=1)
+[Game Programming – Memorial University (YouTube Playlist)](https://www.youtube.com/watch?v=Eoq12SNaWI8&list=PL_xRyXins84_Sq7yZkxGP_MgYAH-Zo8Uu&index=1)
