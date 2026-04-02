@@ -18,7 +18,12 @@ set(HEADERS
 
 # Biblioteca principal para o executável e testes
 add_library(shape_lib STATIC ${SOURCES} ${HEADERS})
-target_link_libraries(shape_lib PRIVATE ImGui-SFML::ImGui-SFML)
+target_link_libraries(shape_lib PUBLIC 
+    sfml-graphics
+    sfml-window
+    sfml-system
+    ImGui-SFML::ImGui-SFML
+)
 target_include_directories(shape_lib PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
 
 set_target_properties(shape_lib PROPERTIES
