@@ -19,7 +19,9 @@ namespace {
 }
 
 /**
- * @brief Função auxiliar para converter sf::Color em ImVec4
+ * @brief Helper function to convert sf::Color to ImVec4
+ * @param color SFML color object
+ * @return ImVec4 color with normalized RGB values (0.0-1.0)
  */
 ImVec4 colorToImVec4(const sf::Color& color) {
   return ImVec4(
@@ -31,7 +33,9 @@ ImVec4 colorToImVec4(const sf::Color& color) {
 }
 
 /**
- * @brief Função auxiliar para converter ImVec4 em sf::Color
+ * @brief Helper function to convert ImVec4 to sf::Color
+ * @param color ImGui color vector with values in range 0.0-1.0
+ * @return SFML color object with RGB values (alpha set to 255)
  */
 sf::Color imVec4ToColor(const ImVec4& color) {
   return sf::Color(
@@ -43,7 +47,9 @@ sf::Color imVec4ToColor(const ImVec4& color) {
 }
 
 /**
- * @brief Renderiza a interface ImGui para edição de formas
+ * @brief Renders the ImGui interface for shape editing
+ * @param shapes Vector of unique pointers to shapes
+ * @param selectedShapeIndex Index of currently selected shape (-1 if none)
  */
 void renderImGuiInterface(
   std::vector<std::unique_ptr<bouncer::Shape>>& shapes,
@@ -52,13 +58,13 @@ void renderImGuiInterface(
   ImGui::Begin("Shape Editor");
   
   if (shapes.empty()) {
-    ImGui::Text("Nenhuma forma carregada");
+    ImGui::Text("No shapes loaded");
     ImGui::End();
     return;
   }
   
-  // Lista de formas
-  ImGui::Text("Formas (%zu):", shapes.size());
+  // Shape list
+  ImGui::Text("Shapes (%zu):", shapes.size());
   ImGui::Separator();
   
   for (size_t i = 0; i < shapes.size(); ++i) {
@@ -71,58 +77,58 @@ void renderImGuiInterface(
   
   ImGui::Separator();
   
-  // Editor de propriedades da forma selecionada
+  // Properties editor for selected shape
   if (selectedShapeIndex >= 0 && selectedShapeIndex < static_cast<int>(shapes.size())) {
     bouncer::Shape& shape = *shapes[selectedShapeIndex];
     
-    ImGui::Text("Propriedades: %s", shape.getName().c_str());
+    ImGui::Text("Properties: %s", shape.getName().c_str());
     ImGui::Separator();
     
-    // Visibilidade
+    // Visibility toggle
     bool visible = shape.isVisible();
-    if (ImGui::Checkbox("Visivel", &visible)) {
+    if (ImGui::Checkbox("Visible", &visible)) {
       shape.setVisible(visible);
     }
     
-    // Nome
+    // Name input
     char nameBuffer[64];
     std::strncpy(nameBuffer, shape.getName().c_str(), sizeof(nameBuffer) - 1);
     nameBuffer[sizeof(nameBuffer) - 1] = '\0';
     
-    if (ImGui::InputText("Nome", nameBuffer, sizeof(nameBuffer))) {
+    if (ImGui::InputText("Name", nameBuffer, sizeof(nameBuffer))) {
       shape.setName(std::string(nameBuffer));
     }
     
-    // Escala (0 a 4)
+    // Scale slider (0 to 4)
     float scale = shape.getUI_Scale();
-    if (ImGui::SliderFloat("Escala", &scale, 0.f, 4.f, "%.2f")) {
+    if (ImGui::SliderFloat("Scale", &scale, 0.f, 4.f, "%.2f")) {
       shape.setUI_Scale(scale);
     }
     
-    // Velocidade X (-8 a 8)
+    // Velocity X slider (-8 to 8)
     sf::Vector2f velocity = shape.getVelocity();
     float velX = velocity.x;
-    if (ImGui::SliderFloat("Velocidade X", &velX, -8.f, 8.f, "%.2f")) {
+    if (ImGui::SliderFloat("Velocity X", &velX, -8.f, 8.f, "%.2f")) {
       shape.setVelocity(sf::Vector2f(velX, velocity.y));
     }
     
-    // Velocidade Y (-8 a 8)
+    // Velocity Y slider (-8 to 8)
     float velY = velocity.y;
-    if (ImGui::SliderFloat("Velocidade Y", &velY, -8.f, 8.f, "%.2f")) {
+    if (ImGui::SliderFloat("Velocity Y", &velY, -8.f, 8.f, "%.2f")) {
       shape.setVelocity(sf::Vector2f(velocity.x, velY));
     }
     
-    // Cor da forma
+    // Shape color picker
     sf::Color shapeColor = shape.getColor();
     ImVec4 colorVec = colorToImVec4(shapeColor);
-    if (ImGui::ColorEdit3("Cor da Forma", &colorVec.x)) {
+    if (ImGui::ColorEdit3("Shape Color", &colorVec.x)) {
       shape.setColor(imVec4ToColor(colorVec));
     }
     
-    // Cor do texto
+    // Text color picker
     sf::Color textColor = shape.getTextColor();
     ImVec4 textColorVec = colorToImVec4(textColor);
-    if (ImGui::ColorEdit3("Cor do Texto", &textColorVec.x)) {
+    if (ImGui::ColorEdit3("Text Color", &textColorVec.x)) {
       shape.setTextColor(imVec4ToColor(textColorVec));
     }
   }
@@ -130,43 +136,49 @@ void renderImGuiInterface(
   ImGui::End();
 }
 
+/**
+ * @brief Main entry point of the application
+ * @param argc Number of command-line arguments
+ * @param argv Array of command-line argument strings
+ * @return EXIT_SUCCESS on success, EXIT_FAILURE on error
+ */
 int main(int argc, char* argv[]) {
   std::cout << "=== SFML Shape Bouncer ===" << std::endl;
-  std::cout << "Argumentos: " << argc << std::endl;
+  std::cout << "Arguments: " << argc << std::endl;
   
-  // Determina o caminho do arquivo de configuração
+  // Determine configuration file path
   std::string configFilePath = CONFIG_FILE_PATH;
   
   if (argc > 1 && std::string(argv[1]) == "--config_file_path" && argc > 2) {
     configFilePath = std::string(argv[2]) + CONFIG_FILE_PATH;
   }
   
-  std::cout << "Arquivo de configuracao: " << configFilePath << std::endl;
+  std::cout << "Configuration file: " << configFilePath << std::endl;
   
-  // Carrega configurações
+  // Load configuration settings
   bouncer::ConfigManager configManager;
   
   if (!configManager.loadFromFile(configFilePath)) {
-    std::cerr << "Erro ao carregar arquivo de configuração" << std::endl;
+    std::cerr << "Error loading configuration file" << std::endl;
     return EXIT_FAILURE;
   }
   
   if (!configManager.isFontLoaded()) {
-    std::cerr << "Erro: Fonte não carregada" << std::endl;
+    std::cerr << "Error: Font not loaded" << std::endl;
     return EXIT_FAILURE;
   }
   
-  // Carrega formas
+  // Load shapes from configuration
   std::vector<std::unique_ptr<bouncer::Shape>> shapes = 
     bouncer::ShapeLoader::loadShapes(configManager, configFilePath);
   
-  std::cout << "Formas carregadas: " << shapes.size() << std::endl;
+  std::cout << "Shapes loaded: " << shapes.size() << std::endl;
   
   if (shapes.empty()) {
-    std::cerr << "Aviso: Nenhuma forma foi carregada" << std::endl;
+    std::cerr << "Warning: No shapes were loaded" << std::endl;
   }
   
-  // Configura janela SFML
+  // Setup SFML window
   const bouncer::WindowConfig& windowConfig = configManager.getWindowConfig();
   sf::RenderWindow window(
     sf::VideoMode({windowConfig.width, windowConfig.height}),
@@ -174,16 +186,16 @@ int main(int argc, char* argv[]) {
   );
   window.setFramerateLimit(60);
   
-  // Inicializa ImGui
+  // Initialize ImGui
   ImGui::SFML::Init(window);
   sf::Clock deltaClock;
   
-  // Índice da forma selecionada
+  // Selected shape index
   int selectedShapeIndex = shapes.empty() ? -1 : 0;
   
-  // Loop principal
+  // Main application loop
   while (window.isOpen()) {
-    // Processa eventos
+    // Process SFML events
     while (const auto event = window.pollEvent()) {
       ImGui::SFML::ProcessEvent(window, *event);
       
@@ -192,10 +204,10 @@ int main(int argc, char* argv[]) {
       }
     }
     
-    // Atualiza ImGui
+    // Update ImGui
     ImGui::SFML::Update(window, deltaClock.restart());
     
-    // Atualiza formas
+    // Update shapes with delta time and window size
     const float deltaTime = deltaClock.getElapsedTime().asSeconds();
     const sf::Vector2u windowSize = window.getSize();
     
@@ -203,10 +215,10 @@ int main(int argc, char* argv[]) {
       shape->update(deltaTime, windowSize);
     }
     
-    // Renderiza interface ImGui
+    // Render ImGui interface
     renderImGuiInterface(shapes, selectedShapeIndex);
     
-    // Desenha
+    // Draw frame
     window.clear(sf::Color::Black);
     
     for (const auto& shape : shapes) {
@@ -217,9 +229,9 @@ int main(int argc, char* argv[]) {
     window.display();
   }
   
-  // Limpeza
+  // Cleanup
   ImGui::SFML::Shutdown();
   
-  std::cout << "Programa finalizado com sucesso" << std::endl;
+  std::cout << "Program finished successfully" << std::endl;
   return EXIT_SUCCESS;
 }

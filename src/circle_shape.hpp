@@ -6,10 +6,20 @@
 namespace bouncer {
 
 /**
- * @brief Classe que representa um círculo com propriedades customizadas
+ * @brief Class representing a circle with custom properties
  */
 class CircleShape : public Shape {
 public:
+  /**
+   * @brief Constructs a CircleShape with specified parameters
+   * @param name Name identifier for the shape
+   * @param position Initial X,Y position
+   * @param velocity Velocity vector (X, Y)
+   * @param color Fill color of the circle
+   * @param radius Radius of the circle
+   * @param font Reference to SFML font for text rendering
+   * @param fontSize Font size in pixels (default: 16)
+   */
   CircleShape(const std::string& name,
               const sf::Vector2f& position,
               const sf::Vector2f& velocity,
@@ -30,11 +40,14 @@ public:
   void setRadius(float radius);
 
 private:
-  sf::CircleShape circle_;
-  sf::Text text_;
-  const sf::Font& font_;
-  float radius_;
+  sf::CircleShape circle_;       ///< SFML circle shape object
+  sf::Text text_;                ///< Text label for the shape
+  const sf::Font& font_;         ///< Reference to font resource
+  float radius_;                 ///< Circle radius value
   
+  /**
+   * @brief Updates text position and appearance
+   */
   void updateText();
 };
 

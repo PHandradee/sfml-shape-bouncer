@@ -3,6 +3,9 @@
 
 namespace bouncer {
 
+/**
+ * @brief Constructs a RectangleShape with specified parameters
+ */
 RectangleShape::RectangleShape(const std::string& name,
                                const sf::Vector2f& position,
                                const sf::Vector2f& velocity,
@@ -15,25 +18,29 @@ RectangleShape::RectangleShape(const std::string& name,
   , font_(font)
   , size_(width, height)
 {
-  // Configura propriedades
+  // Initialize properties
   properties_.name = name;
   properties_.velocity = velocity;
   properties_.fontSize = fontSize;
   properties_.textColor = sf::Color::White;
   properties_.scale = 1.f;
   
-  // Configura o retângulo
+  // Configure rectangle shape
   rectangle_.setSize(size_);
   rectangle_.setFillColor(color);
   rectangle_.setPosition(position);
   
-  // Configura o texto
+  // Configure text label
   text_.setString(properties_.name);
   text_.setCharacterSize(properties_.fontSize);
   text_.setFillColor(properties_.textColor);
   updateText();
 }
 
+/**
+ * @brief Draws the rectangle and its text label on the render window
+ * @param window SFML render window to draw on
+ */
 void RectangleShape::draw(sf::RenderWindow& window) const {
   if (!properties_.visible) return;
   
@@ -41,44 +48,49 @@ void RectangleShape::draw(sf::RenderWindow& window) const {
   window.draw(text_);
 }
 
+/**
+ * @brief Updates rectangle position and handles boundary collisions
+ * @param deltaTime Time elapsed since last update in seconds
+ * @param windowSize Current window dimensions
+ */
 void RectangleShape::update(float deltaTime, const sf::Vector2u& windowSize) {
   if (!properties_.visible) return;
   
-  // Atualiza posição baseada na velocidade
+  // Update position based on velocity (normalized to 60 FPS)
   sf::Vector2f newPos = rectangle_.getPosition();
-  newPos.x += properties_.velocity.x * deltaTime * 60.f; // Normalizado para 60 FPS
+  newPos.x += properties_.velocity.x * deltaTime * 60.f;
   newPos.y += properties_.velocity.y * deltaTime * 60.f;
   
-  // Obtém bounds da forma
+  // Get shape bounds for collision detection
   const sf::FloatRect bounds = getGlobalBounds();
   
-  // Verifica colisão com as bordas e inverte velocidade se necessário
-  // Borda esquerda
+  // Check collision with window boundaries and reverse velocity if needed
+  // Left boundary
   if (bounds.position.x <= 0.f) {
     newPos.x = -bounds.position.x + rectangle_.getPosition().x;
     properties_.velocity.x = -properties_.velocity.x;
   }
-  // Borda direita
+  // Right boundary
   else if (bounds.position.x + bounds.size.x >= static_cast<float>(windowSize.x)) {
     newPos.x = static_cast<float>(windowSize.x) - bounds.size.x - rectangle_.getPosition().x + newPos.x;
     properties_.velocity.x = -properties_.velocity.x;
   }
   
-  // Borda superior
+  // Top boundary
   if (bounds.position.y <= 0.f) {
     newPos.y = -bounds.position.y + rectangle_.getPosition().y;
     properties_.velocity.y = -properties_.velocity.y;
   }
-  // Borda inferior
+  // Bottom boundary
   else if (bounds.position.y + bounds.size.y >= static_cast<float>(windowSize.y)) {
     newPos.y = static_cast<float>(windowSize.y) - bounds.size.y - rectangle_.getPosition().y + newPos.y;
     properties_.velocity.y = -properties_.velocity.y;
   }
   
-  // Aplica nova posição
+  // Apply new position
   rectangle_.setPosition(newPos);
   
-  // Atualiza posição do texto se houve colisão ou mudança de posição
+  // Update text position after movement or collision
   updateText();
 }
 
@@ -112,13 +124,16 @@ void RectangleShape::setSize(const sf::Vector2f& size) {
   updateText();
 }
 
+/**
+ * @brief Updates text font, content, size, color and centers it within the rectangle
+ */
 void RectangleShape::updateText() {
   text_.setFont(font_);
   text_.setString(properties_.name);
   text_.setCharacterSize(properties_.fontSize);
   text_.setFillColor(properties_.textColor);
   
-  // Centraliza o texto no retângulo
+  // Center text within the rectangle
   const sf::Vector2f textPos = calculateTextCenterPosition(text_);
   text_.setPosition(textPos);
 }

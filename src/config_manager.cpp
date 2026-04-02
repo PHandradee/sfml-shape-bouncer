@@ -5,18 +5,23 @@
 
 namespace bouncer {
 
+/**
+ * @brief Loads configuration settings from a file
+ * @param filePath Path to the configuration file
+ * @return true if loaded successfully, false otherwise
+ */
 bool ConfigManager::loadFromFile(const std::string& filePath) {
   std::ifstream file(filePath);
   
   if (!file.is_open()) {
-    std::cerr << "Erro: Não foi possível abrir o arquivo de configuração: " 
+    std::cerr << "Error: Could not open configuration file: " 
               << filePath << std::endl;
     return false;
   }
   
   std::string line;
   while (std::getline(file, line)) {
-    // Ignora linhas vazias ou comentários
+    // Skip empty lines and comments
     if (line.empty() || line[0] == '#') {
       continue;
     }
@@ -28,6 +33,10 @@ bool ConfigManager::loadFromFile(const std::string& filePath) {
   return true;
 }
 
+/**
+ * @brief Parses a single line from the configuration file
+ * @param line The line content to parse
+ */
 void ConfigManager::parseLine(const std::string& line) {
   const std::vector<std::string> tokens = tokenize(line);
   
@@ -42,12 +51,16 @@ void ConfigManager::parseLine(const std::string& line) {
   } else if (type == "Font") {
     parseFont(tokens);
   }
-  // Circle e Rectangle são processados pelo ShapeLoader
+  // Circle and Rectangle are processed by ShapeLoader
 }
 
+/**
+ * @brief Parses a Window configuration line
+ * @param tokens Tokenized line components [Window, width, height]
+ */
 void ConfigManager::parseWindow(const std::vector<std::string>& tokens) {
   if (tokens.size() < 3) {
-    std::cerr << "Erro: Linha Window inválida" << std::endl;
+    std::cerr << "Error: Invalid Window line" << std::endl;
     return;
   }
   
@@ -55,13 +68,17 @@ void ConfigManager::parseWindow(const std::vector<std::string>& tokens) {
     windowConfig_.width = std::stoul(tokens[1]);
     windowConfig_.height = std::stoul(tokens[2]);
   } catch (const std::exception& e) {
-    std::cerr << "Erro ao parsear Window: " << e.what() << std::endl;
+    std::cerr << "Error parsing Window: " << e.what() << std::endl;
   }
 }
 
+/**
+ * @brief Parses a Font configuration line and loads the font
+ * @param tokens Tokenized line components [Font, path, size, R, G, B]
+ */
 void ConfigManager::parseFont(const std::vector<std::string>& tokens) {
   if (tokens.size() < 6) {
-    std::cerr << "Erro: Linha Font inválida" << std::endl;
+    std::cerr << "Error: Invalid Font line" << std::endl;
     return;
   }
   
@@ -73,20 +90,25 @@ void ConfigManager::parseFont(const std::vector<std::string>& tokens) {
     const std::uint8_t b = static_cast<std::uint8_t>(std::stoi(tokens[5]));
     fontConfig_.color = sf::Color(r, g, b);
     
-    // Carrega a fonte
+    // Load the font file
     if (font_.openFromFile(fontConfig_.filePath)) {
       fontLoaded_ = true;
     } else {
-      std::cerr << "Erro: Não foi possível carregar a fonte: " 
+      std::cerr << "Error: Could not load font: " 
                 << fontConfig_.filePath << std::endl;
       fontLoaded_ = false;
     }
   } catch (const std::exception& e) {
-    std::cerr << "Erro ao parsear Font: " << e.what() << std::endl;
+    std::cerr << "Error parsing Font: " << e.what() << std::endl;
     fontLoaded_ = false;
   }
 }
 
+/**
+ * @brief Splits a string into whitespace-delimited tokens
+ * @param line The input string to tokenize
+ * @return Vector of string tokens
+ */
 std::vector<std::string> ConfigManager::tokenize(const std::string& line) {
   std::vector<std::string> tokens;
   std::istringstream iss(line);

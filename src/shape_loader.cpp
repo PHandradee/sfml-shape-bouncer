@@ -7,6 +7,12 @@
 
 namespace bouncer {
 
+/**
+ * @brief Loads shapes from the configuration file
+ * @param configManager Configuration manager with loaded font resource
+ * @param filePath Path to the configuration file
+ * @return Vector of unique pointers to loaded shapes
+ */
 std::vector<std::unique_ptr<Shape>> ShapeLoader::loadShapes(
   const ConfigManager& configManager,
   const std::string& filePath)
@@ -16,13 +22,13 @@ std::vector<std::unique_ptr<Shape>> ShapeLoader::loadShapes(
   std::ifstream file(filePath);
   
   if (!file.is_open()) {
-    std::cerr << "Erro: Não foi possível abrir o arquivo de configuração: " 
+    std::cerr << "Error: Could not open configuration file: " 
               << filePath << std::endl;
     return shapes;
   }
   
   if (!configManager.isFontLoaded()) {
-    std::cerr << "Erro: Fonte não carregada" << std::endl;
+    std::cerr << "Error: Font not loaded" << std::endl;
     return shapes;
   }
   
@@ -31,7 +37,7 @@ std::vector<std::unique_ptr<Shape>> ShapeLoader::loadShapes(
   
   std::string line;
   while (std::getline(file, line)) {
-    // Ignora linhas vazias ou comentários
+    // Skip empty lines and comments
     if (line.empty() || line[0] == '#') {
       continue;
     }
@@ -55,32 +61,40 @@ std::vector<std::unique_ptr<Shape>> ShapeLoader::loadShapes(
         shapes.push_back(std::move(shape));
       }
     }
-    // Window e Font são processados pelo ConfigManager
+    // Window and Font are processed by ConfigManager
   }
   
   file.close();
   return shapes;
 }
 
+/**
+ * @brief Parses a Circle configuration line and creates a CircleShape
+ * Format: Circle Name X Y SX SY R G B Radius
+ * @param tokens Tokenized line components
+ * @param font Reference to SFML font for text rendering
+ * @param fontSize Font size in pixels
+ * @return Unique pointer to created CircleShape or nullptr on error
+ */
 std::unique_ptr<Shape> ShapeLoader::parseCircle(
   const std::vector<std::string>& tokens,
   const sf::Font& font,
   unsigned int fontSize)
 {
-  // Formato: Circle N X Y SX SY R G B Radius
+  // Expected format: Circle Name X Y SX SY R G B Radius
   // tokens[0] = "Circle"
   // tokens[1] = name
-  // tokens[2] = X
-  // tokens[3] = Y
-  // tokens[4] = SX (velocidade X)
-  // tokens[5] = SY (velocidade Y)
-  // tokens[6] = R (cor vermelha)
-  // tokens[7] = G (cor verde)
-  // tokens[8] = B (cor azul)
-  // tokens[9] = Radius
+  // tokens[2] = X position
+  // tokens[3] = Y position
+  // tokens[4] = velocity X
+  // tokens[5] = velocity Y
+  // tokens[6] = color red component
+  // tokens[7] = color green component
+  // tokens[8] = color blue component
+  // tokens[9] = radius
   
   if (tokens.size() < 10) {
-    std::cerr << "Erro: Linha Circle inválida (número insuficiente de parâmetros)" << std::endl;
+    std::cerr << "Error: Invalid Circle line (insufficient parameters)" << std::endl;
     return nullptr;
   }
   
@@ -106,31 +120,39 @@ std::unique_ptr<Shape> ShapeLoader::parseCircle(
       name, position, velocity, color, radius, font, fontSize);
     
   } catch (const std::exception& e) {
-    std::cerr << "Erro ao parsear Circle: " << e.what() << std::endl;
+    std::cerr << "Error parsing Circle: " << e.what() << std::endl;
     return nullptr;
   }
 }
 
+/**
+ * @brief Parses a Rectangle configuration line and creates a RectangleShape
+ * Format: Rectangle Name X Y SX SY R G B Width Height
+ * @param tokens Tokenized line components
+ * @param font Reference to SFML font for text rendering
+ * @param fontSize Font size in pixels
+ * @return Unique pointer to created RectangleShape or nullptr on error
+ */
 std::unique_ptr<Shape> ShapeLoader::parseRectangle(
   const std::vector<std::string>& tokens,
   const sf::Font& font,
   unsigned int fontSize)
 {
-  // Formato: Rectangle N X Y SX SY R G B W H
+  // Expected format: Rectangle Name X Y SX SY R G B Width Height
   // tokens[0] = "Rectangle"
   // tokens[1] = name
-  // tokens[2] = X
-  // tokens[3] = Y
-  // tokens[4] = SX (velocidade X)
-  // tokens[5] = SY (velocidade Y)
-  // tokens[6] = R (cor vermelha)
-  // tokens[7] = G (cor verde)
-  // tokens[8] = B (cor azul)
-  // tokens[9] = W (largura)
-  // tokens[10] = H (altura)
+  // tokens[2] = X position
+  // tokens[3] = Y position
+  // tokens[4] = velocity X
+  // tokens[5] = velocity Y
+  // tokens[6] = color red component
+  // tokens[7] = color green component
+  // tokens[8] = color blue component
+  // tokens[9] = width
+  // tokens[10] = height
   
   if (tokens.size() < 11) {
-    std::cerr << "Erro: Linha Rectangle inválida (número insuficiente de parâmetros)" << std::endl;
+    std::cerr << "Error: Invalid Rectangle line (insufficient parameters)" << std::endl;
     return nullptr;
   }
   
@@ -157,11 +179,16 @@ std::unique_ptr<Shape> ShapeLoader::parseRectangle(
       name, position, velocity, color, w, h, font, fontSize);
     
   } catch (const std::exception& e) {
-    std::cerr << "Erro ao parsear Rectangle: " << e.what() << std::endl;
+    std::cerr << "Error parsing Rectangle: " << e.what() << std::endl;
     return nullptr;
   }
 }
 
+/**
+ * @brief Splits a string into whitespace-delimited tokens
+ * @param line The input string to tokenize
+ * @return Vector of string tokens
+ */
 std::vector<std::string> ShapeLoader::tokenize(const std::string& line) {
   std::vector<std::string> tokens;
   std::istringstream iss(line);

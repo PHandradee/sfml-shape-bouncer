@@ -9,15 +9,15 @@
 namespace bouncer {
 
 /**
- * @brief Carregador de formas que lê do arquivo de configuração e cria as formas
+ * @brief Shape loader that reads configuration file and creates shape objects
  */
 class ShapeLoader {
 public:
   /**
-   * @brief Carrega formas do arquivo de configuração
-   * @param configManager Gerenciador de configuração já carregado
-   * @param filePath Caminho para o arquivo de configuração
-   * @return Vetor de ponteiros únicos para as formas carregadas
+   * @brief Loads shapes from the configuration file
+   * @param configManager Configuration manager with loaded font resource
+   * @param filePath Path to the configuration file
+   * @return Vector of unique pointers to loaded shapes
    */
   static std::vector<std::unique_ptr<Shape>> loadShapes(
     const ConfigManager& configManager,
@@ -25,7 +25,11 @@ public:
 
 private:
   /**
-   * @brief Parseia uma linha Circle do arquivo de configuração
+   * @brief Parses a Circle configuration line and creates a CircleShape
+   * @param tokens Tokenized line components
+   * @param font Reference to SFML font for text rendering
+   * @param fontSize Font size in pixels
+   * @return Unique pointer to created CircleShape or nullptr on error
    */
   static std::unique_ptr<Shape> parseCircle(
     const std::vector<std::string>& tokens,
@@ -33,7 +37,11 @@ private:
     unsigned int fontSize);
   
   /**
-   * @brief Parseia uma linha Rectangle do arquivo de configuração
+   * @brief Parses a Rectangle configuration line and creates a RectangleShape
+   * @param tokens Tokenized line components
+   * @param font Reference to SFML font for text rendering
+   * @param fontSize Font size in pixels
+   * @return Unique pointer to created RectangleShape or nullptr on error
    */
   static std::unique_ptr<Shape> parseRectangle(
     const std::vector<std::string>& tokens,
@@ -41,7 +49,9 @@ private:
     unsigned int fontSize);
   
   /**
-   * @brief Divide uma string em tokens
+   * @brief Splits a string into whitespace-delimited tokens
+   * @param line The input string to tokenize
+   * @return Vector of string tokens
    */
   [[nodiscard]] static std::vector<std::string> tokenize(const std::string& line);
 };

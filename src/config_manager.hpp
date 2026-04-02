@@ -9,79 +9,88 @@
 namespace bouncer {
 
 /**
- * @brief Estrutura para armazenar configurações da janela
+ * @brief Structure for storing window configuration settings
  */
 struct WindowConfig {
-  unsigned int width{800u};
-  unsigned int height{600u};
+  unsigned int width{800u};    ///< Window width in pixels
+  unsigned int height{600u};   ///< Window height in pixels
 };
 
 /**
- * @brief Estrutura para armazenar configurações da fonte
+ * @brief Structure for storing font configuration settings
  */
 struct FontConfig {
-  std::string filePath{};
-  unsigned int size{16u};
-  sf::Color color{sf::Color::White};
+  std::string filePath{};      ///< Path to the font file
+  unsigned int size{16u};      ///< Font size in pixels
+  sf::Color color{sf::Color::White};  ///< Default text color
 };
 
 /**
- * @brief Gerenciador de configuração que lê e parseia o arquivo config.txt
+ * @brief Configuration manager that reads and parses config.txt file
  */
 class ConfigManager {
 public:
   ConfigManager() = default;
   
   /**
-   * @brief Carrega as configurações do arquivo
-   * @param filePath Caminho para o arquivo de configuração
-   * @return true se carregou com sucesso, false caso contrário
+   * @brief Loads configuration settings from a file
+   * @param filePath Path to the configuration file
+   * @return true if loaded successfully, false otherwise
    */
   bool loadFromFile(const std::string& filePath);
   
   /**
-   * @brief Obtém a configuração da janela
+   * @brief Gets the window configuration settings
+   * @return Const reference to WindowConfig structure
    */
   [[nodiscard]] const WindowConfig& getWindowConfig() const noexcept { return windowConfig_; }
   
   /**
-   * @brief Obtém a configuração da fonte
+   * @brief Gets the font configuration settings
+   * @return Const reference to FontConfig structure
    */
   [[nodiscard]] const FontConfig& getFontConfig() const noexcept { return fontConfig_; }
   
   /**
-   * @brief Obtém a fonte carregada
+   * @brief Gets the loaded SFML font object
+   * @return Const reference to the SFML Font
    */
   [[nodiscard]] const sf::Font& getFont() const noexcept { return font_; }
   
   /**
-   * @brief Verifica se a fonte foi carregada com sucesso
+   * @brief Checks if the font was loaded successfully
+   * @return true if font is loaded, false otherwise
    */
   [[nodiscard]] bool isFontLoaded() const noexcept { return fontLoaded_; }
 
 private:
-  WindowConfig windowConfig_;
-  FontConfig fontConfig_;
-  sf::Font font_;
-  bool fontLoaded_{false};
+  WindowConfig windowConfig_;   ///< Window configuration settings
+  FontConfig fontConfig_;       ///< Font configuration settings
+  sf::Font font_;               ///< Loaded SFML font resource
+  bool fontLoaded_{false};      ///< Flag indicating if font loaded successfully
   
   /**
-   * @brief Parseia uma linha do arquivo de configuração
+   * @brief Parses a single line from the configuration file
+   * @param line The line content to parse
    */
   void parseLine(const std::string& line);
   
   /**
-   * @brief Parseia uma linha Window
+   * @brief Parses a Window configuration line
+   * @param tokens Tokenized line components
    */
   void parseWindow(const std::vector<std::string>& tokens);
   
   /**
-   * @brief Parseia uma linha Font
+   * @brief Parses a Font configuration line
+   * @param tokens Tokenized line components
    */
   void parseFont(const std::vector<std::string>& tokens);
   
   /**
-   * @brief Divide uma string em tokens
+   * @brief Splits a string into whitespace-delimited tokens
+   * @param line The input string to tokenize
+   * @return Vector of string tokens
    */
   [[nodiscard]] static std::vector<std::string> tokenize(const std::string& line);
 };
