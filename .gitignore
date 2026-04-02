@@ -1,5 +1,59 @@
-build
-bin/*
-.cache/
-compile_commands.json
-imgui.ini
+```
+# Build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+*.out
+build/
+dist/
+
+# Dependencies
+venv/
+.venv/
+__pycache__/
+*.egg-info/
+node_modules/
+
+# CMake
+CMakeFiles/
+cmake-build-*/
+Makefile
+*.cmake
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+htmlcov/
+.coverage
+
+# Environment
+.env
+.env.local
+*.env.*
+
+# Temp files
+*.tmp
+.DS_Store
+Thumbs.db
+
+# Compressed files
+*.zip
+*.gz
+*.tar
+*.tgz
+*.bz2
+*.xz
+*.7z
+*.rar
+```
